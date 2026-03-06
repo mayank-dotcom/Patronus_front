@@ -18,25 +18,35 @@ export const FileUploader = ({ onUploadSuccess, onFileReady }: FileUploaderProps
     const file = acceptedFiles[0];
     if (!file) return;
 
-    // Immediately expose a blob URL for the PDF viewer
-    const blobUrl = URL.createObjectURL(file);
-    onFileReady?.(blobUrl);
-
     const formData = new FormData();
     formData.append('file', file);
 
     setStatus('uploading');
     setError('');
+    
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/upload', formData, {
+      // First upload to backend
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+      
+      // After successful upload, create blob URL for preview
+      const blobUrl = URL.createObjectURL(file);
+      onFileReady?.(blobUrl);
+      
       setStatus('success');
       onUploadSuccess(response.data.details);
-    } catch (err) {
+      
+      // Refresh the PDF list after upload completes
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (err: any) {
       setStatus('error');
-      setError('Upload failed. Check backend.');
-      console.error(err);
+      const errorMsg = err.response?.data?.details || err.message || 'Upload failed';
+      setError(`Upload failed: ${errorMsg}`);
+      console.error('Upload error:', err);
+      onFileReady?.(null);
     }
   };
 

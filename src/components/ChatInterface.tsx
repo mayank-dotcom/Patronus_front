@@ -85,21 +85,35 @@ export const ChatInterface = () => {
         chat_history: chatHistory,
       });
 
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        text: response.data.answer || 'No response from AI.',
-        sender: 'ai',
-        thought: response.data.thought_process,
-        timestamp: new Date().toISOString(),
-      };
-
-      setMessages((prev) => [...prev, aiMsg]);
-    } catch (err) {
-      console.error(err);
+      // Check if there's an error in the response
+      if (response.data.error) {
+        console.error('API Error:', response.data.error);
+        const errMsg: Message = {
+          id: (Date.now() + 1).toString(),
+          text: response.data.answer || 'System Error: Unable to process your request.',
+          sender: 'ai',
+          thought: response.data.thought_process || `Error: ${response.data.error}`,
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, errMsg]);
+      } else {
+        const aiMsg: Message = {
+          id: (Date.now() + 1).toString(),
+          text: response.data.answer || 'No response from AI.',
+          sender: 'ai',
+          thought: response.data.thought_process,
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, aiMsg]);
+      }
+    } catch (err: any) {
+      console.error('Request failed:', err);
+      const errorMsg = err.response?.data?.error || err.message || 'Failed to connect to backend';
       const errMsg: Message = {
         id: (Date.now() + 1).toString(),
-        text: 'System Error: Check backend connection.',
+        text: `System Error: ${errorMsg}. Please check your connection or try again.`,
         sender: 'ai',
+        thought: `Technical details: ${JSON.stringify(err.response?.data || err.message)}`,
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errMsg]);
