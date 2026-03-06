@@ -2,25 +2,205 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
+  --surface: #ffffff;
+  /* Sidebar cards red */
+  --surface-2: #f8f8f8;
+  --primary: #FF0000;
+  --primary-light: #FF3333;
+  --accent: #000000;
+  --accent-light: #333333;
+  --border-r: #000000;
+  --border-b: rgba(0, 0, 0, 0.15);
+  --shadow-2d: 4px 4px 0px #000000;
+  --shadow-2d-red: 4px 4px 0px #FF0000;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: #1a1a1a;
+}
+
+/* ──────────────────────────────────────
+   2D Animated Design System
+   User-Specified Theme
+────────────────────────────────────── */
+@layer components {
+
+  /* Sidebar cards: Red background, Black border & shadow */
+  .card-2d {
+    background: #ffffff;
+    border: 3px solid #000000;
+    box-shadow: 4px 4px 0px #000000;
+  }
+
+  /* Ingestion card: Black background, Red text, Red shadow */
+  .card-ingestion {
+    background: #000000;
+    color: #FF0000 !important;
+    border: 3px solid #FF0000;
+    box-shadow: 4px 4px 0px #FF0000;
+  }
+
+  /* Dot grid background pattern */
+  .dot-grid {
+    background-image: radial-gradient(circle, rgba(255, 0, 0, 0.1) 1.5px, transparent 1.5px);
+    background-size: 32px 32px;
+  }
+
+  /* AI Bubbles: Red Background, White Border, Black shadow */
+  .chat-bubble-ai {
+    background: #FF0000;
+    color: #ffffff;
+    border-radius: 4px 16px 16px 16px;
+    padding: 14px 18px;
+    border: 3px solid #000000;
+    box-shadow: 4px 4px 0px #000000;
+  }
+
+  .chat-bubble-user {
+    background: #000000;
+    color: #ffffff;
+    border-radius: 16px 4px 16px 16px;
+    padding: 14px 18px;
+    border: 3px solid #000000;
+    box-shadow: 4px 4px 0px #FF0000;
+  }
+
+  /* Neon 2D button */
+  .btn-2d {
+    background: #FF0000;
+    border: 3px solid #000000;
+    box-shadow: 4px 4px 0px #000000;
+    color: white;
+    font-weight: 900;
+    text-transform: uppercase;
+    transition: all 0.1s ease;
+  }
+
+  .btn-2d:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px #000000;
+  }
+
+  /* Input 2D style */
+  .input-2d {
+    background: #ffffff;
+    border: 3px solid #000000;
+    color: #000;
+    font-weight: 900;
+    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1);
+  }
+
+  .input-2d:focus {
+    outline: none;
+    border-color: #FF0000;
+    box-shadow: 4px 4px 0px #000000;
+  }
+
+  /* Sidebar scenario card: Red background, Black text inside if not careful */
+  .scenario-card {
+    background: #FF0000;
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0px #000000;
+    border-radius: 0px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+  }
+
+  .scenario-card:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px #000000;
+    background: #E60000;
+  }
+}
+
+/* ──────────────────────────────────────
+   Markdown content
+────────────────────────────────────── */
+@layer components {
+
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3 {
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+  }
+
+  .markdown-body p {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+    color: #ffffff;
+  }
+
+  .markdown-body strong {
+    color: #000000;
+    background: #ffffff;
+    padding: 0 4px;
+    font-weight: 800;
+  }
+
+  .markdown-body table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1rem 0;
+    border: 3px solid #ffffff;
+    box-shadow: 4px 4px 0px #000000;
+    background: #FF0000;
+    color: white;
+  }
+
+  .markdown-body th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 900;
+    color: #ffffff;
+    border-bottom: 3px solid #ffffff;
+  }
+
+  .markdown-body td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .markdown-body tr:last-child td {
+    border-bottom: none;
+  }
+
+  .markdown-body blockquote {
+    border-left: 5px solid #000000;
+    padding-left: 1rem;
+    color: #ffffff;
+    font-style: italic;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+  }
+}
+
+/* ──────────────────────────────────────
+   Custom scrollbar
+────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FF0000;
 }
