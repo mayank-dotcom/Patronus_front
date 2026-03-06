@@ -1,7 +1,6 @@
 "use client";
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { ChatInterface } from '@/components/ChatInterface';
-import { FileUploader } from '@/components/FileUploader';
 import { PdfViewer } from '@/components/PdfViewer';
 import { ShieldCheck, Database, Calculator, Activity, FileText, ChevronDown, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -159,37 +158,11 @@ function PdfDropdown({
 
 /* ─── Main Page ─────────────────────── */
 export default function Home() {
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [activePdfId, setActivePdfId] = useState<number | null>(null);
-  const [pdfs, setPdfs] = useState<UploadedPDF[]>([]);
-  const [pdfsLoading, setPdfsLoading] = useState(false);
+  const [showPdfViewer, setShowPdfViewer] = useState(false);
+  const pdfUrl = '/AAA.pdf'; // Always show AAA.pdf from public folder
 
-  const fetchPdfs = useCallback(async () => {
-    setPdfsLoading(true);
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pdfs`);
-      const data: UploadedPDF[] = await res.json();
-      setPdfs(data);
-    } catch (err) {
-      console.error('Failed to fetch PDFs', err);
-    } finally {
-      setPdfsLoading(false);
-    }
-  }, []);
-
-  // Fetch on mount
-  useEffect(() => { fetchPdfs(); }, [fetchPdfs]);
-
-  const handleSelectPdf = (pdf: UploadedPDF) => {
-    setActivePdfId(pdf.id);
-    setPdfUrl(`${process.env.NEXT_PUBLIC_API_URL}${pdf.url}`);
-  };
-
-  const handleNewUpload = (blobUrl: string | null) => {
-    setPdfUrl(blobUrl);
-    setActivePdfId(null);  // blob URLs have no DB id yet
-    // Refresh list after a short delay (upload takes time)
-    setTimeout(fetchPdfs, 1500);
+  const togglePdfViewer = () => {
+    setShowPdfViewer(!showPdfViewer);
   };
 
   return (
@@ -250,24 +223,43 @@ export default function Home() {
             {/* Scrollable sidebar body */}
             <div className="flex-1 overflow-y-auto p-5 space-y-6">
 
-              {/* Upload */}
+              {/* Toggle PDF Viewer Button */}
               <section>
-                <p className="text-[11px] font-black text-black uppercase tracking-widest mb-3">⬡ INGESTION</p>
-                <FileUploader onUploadSuccess={() => { }} onFileReady={handleNewUpload} />
-              </section>
-
-              {/* PDF Library dropdown */}
-              <section>
-                <p className="text-[11px] font-black text-black uppercase tracking-widest mb-3">
-                  ⬡ ARCHIVES ({pdfs.length})
-                </p>
-                <PdfDropdown
-                  pdfs={pdfs}
-                  activePdfId={activePdfId}
-                  onSelect={handleSelectPdf}
-                  onRefresh={fetchPdfs}
-                  loading={pdfsLoading}
-                />
+                <p className="text-[11px] font-black text-black uppercase tracking-widest mb-3">⬡ DOCUMENTS</p>
+                <motion.button
+                  onClick={togglePdfViewer}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full p-4 rounded-lg text-left transition-all border-3 border-black"
+                  style={{
+                    background: showPdfViewer ? '#FF0000' : '#ffffff',
+                    boxShadow: '3px 3px 0px #000000',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLButtonElement).style.background = showPdfViewer ? '#cc0000' : '#f0f0f0';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLButtonElement).style.background = showPdfViewer ? '#FF0000' : '#ffffff';
+                  }}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div
+                      className="w-10 h-10 rounded flex items-center justify-center shrink-0"
+                      style={{
+                        background: showPdfViewer ? '#000000' : '#FF0000',
+                        border: '2px solid #000',
+                      }}
+                    >
+                      <FileText className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-[12px] font-black text-black uppercase tracking-widest">
+                        {showPdfViewer ? 'HIDE PDF' : 'VIEW PDF'}
+                      </p>
+                      <p className="text-[10px] text-black/70 font-bold">AAA.pdf</p>
+                    </div>
+                  </div>
+                </motion.button>
               </section>
 
               {/* Query templates */}
@@ -322,7 +314,7 @@ export default function Home() {
 
           {/* ── PDF Viewer ── */}
           <AnimatePresence>
-            {pdfUrl && (
+            {showPdfViewer && (
               <motion.div
                 initial={{ opacity: 0, x: 40 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -331,7 +323,7 @@ export default function Home() {
                 className="shrink-0 h-full overflow-hidden card-2d"
                 style={{ width: 420 }}
               >
-                <PdfViewer url={pdfUrl} onClose={() => { setPdfUrl(null); setActivePdfId(null); }} />
+                <PdfViewer url={pdfUrl} onClose={() => { setShowPdfViewer(false); }} />
               </motion.div>
             )}
           </AnimatePresence>
